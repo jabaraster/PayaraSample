@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -33,6 +34,9 @@ public class UserResource {
     @Inject
     UserService userService;
 
+    @Inject
+    Validator   validator;
+
     /**
      * @param pId
      * @return
@@ -43,7 +47,7 @@ public class UserResource {
     public EUser getById(@PathParam("id") final long pId) {
         try {
             return this.userService.getById(new IdValue<>(pId));
-        } catch (@SuppressWarnings("unused") final NotFound _) {
+        } catch (@SuppressWarnings("unused") final NotFound e) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
     }
@@ -66,6 +70,16 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
     public Response putIndex(final EUser pUser) {
+        if (pUser == null) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
+        try {
+            this.validator.validate(pUser);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
         this.userService.persist(pUser);
         return Response.status(Status.CREATED).build();
     }

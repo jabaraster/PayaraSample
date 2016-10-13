@@ -108,14 +108,15 @@ public class WebAppContainer {
 
     private void startCore() {
         System.setProperty("java.awt.headless", Boolean.toString(true)); // ヘッドレスにしないとMacにおいてアイコンが起動して面倒 //$NON-NLS-1$
-        sendStopCommand(COMMAND_PORT); // 既に起動しているプロセスがあれば停止する.
 
         try {
+            sendStopCommand(COMMAND_PORT); // 既に起動しているプロセスがあれば停止する.
+
             final BootstrapProperties bootstrap = new BootstrapProperties();
             final GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap);
             final GlassFishProperties glassfishProperties = new GlassFishProperties();
             glassfishProperties.setPort("http-listener", this.httpPort); //$NON-NLS-1$
-            glassfishProperties.setPort("https-listener", HTTPS_PORT); //$NON-NLS-1$
+            // glassfishProperties.setPort("https-listener", HTTPS_PORT); //$NON-NLS-1$
             this.glassfish = runtime.newGlassFish(glassfishProperties);
             glassfish.start();
 
@@ -130,8 +131,8 @@ public class WebAppContainer {
 
             startMonitoringStopCommand(COMMAND_PORT, glassfish);
 
-        } catch (final GlassFishException ex) {
-            Logger.getLogger(WebAppContainer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (final GlassFishException e) {
+            Logger.getLogger(WebAppContainer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
@@ -144,7 +145,7 @@ public class WebAppContainer {
     }
 
     private static void sendStopCommand(final int pPort) {
-        try (final Socket accept = new Socket(InetAddress.getLocalHost(), pPort)) {
+        try (final Socket accept = new Socket(InetAddress.getByName("127.0.0.1"), pPort)) {
             new BufferedWriter(new OutputStreamWriter(accept.getOutputStream())).newLine();
         } catch (@SuppressWarnings("unused") final ConnectException e) {
             // nop

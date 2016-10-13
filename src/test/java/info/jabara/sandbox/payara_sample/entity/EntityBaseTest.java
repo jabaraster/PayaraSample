@@ -7,6 +7,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -64,9 +65,14 @@ public class EntityBaseTest {
     @SuppressWarnings("static-method")
     @Test
     public void _想定するJSONをオブジェクトに変換できること() {
-        final String json = "{\"id\":1,\"name\":\"hoge\",\"created\":null,\"updated\":null}";
+        final long now = Calendar.getInstance().getTimeInMillis();
+        final String name = "hoge";
+        final String json = "{\"id\":1,\"name\":\"" + name + "\",\"created\":" + now + ",\"updated\":" + now + "}";
         final EUser u = new EntityBase.JsonConverter().parse(json, EUser.class);
 
         assertThat(u.getId(), is(new IdValue<EUser>(1)));
+        assertThat(u.getName(), is(name));
+        assertThat(u.getCreated(), is(new Date(now)));
+        assertThat(u.getUpdated(), is(new Date(now)));
     }
 }

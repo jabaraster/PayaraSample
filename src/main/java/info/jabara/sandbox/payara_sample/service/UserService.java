@@ -15,6 +15,8 @@ import javax.transaction.Transactional;
 import info.jabara.sandbox.payara_sample.entity.EUser;
 import info.jabara.sandbox.payara_sample.entity.IdValue;
 import info.jabara.sandbox.payara_sample.model.NotFound;
+import info.jabara.sandbox.payara_sample.system.WithErrorMessage;
+import info.jabara.sandbox.payara_sample.util.Args;
 
 /**
  *
@@ -42,6 +44,7 @@ public class UserService {
      * @throws NotFound
      */
     public EUser getById(final IdValue<EUser> pId) throws NotFound {
+        Args.checkNull(pId, "pId");
         final EUser ret = em.find(EUser.class, Long.valueOf(pId.getValue()));
         if (ret == null) {
             throw NotFound.INSTANCE;
@@ -53,7 +56,9 @@ public class UserService {
      * @param pUser
      */
     @Transactional
+    @WithErrorMessage
     public void persist(final EUser pUser) {
+        Args.checkNull(pUser, "pUser");
         this.em.persist(pUser);
         this.em.flush();
     }

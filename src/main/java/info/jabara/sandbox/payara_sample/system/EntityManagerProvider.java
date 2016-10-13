@@ -1,7 +1,7 @@
 /**
  *
  */
-package info.jabara.sandbox.payara_sample.model;
+package info.jabara.sandbox.payara_sample.system;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
@@ -15,5 +15,5 @@ import javax.persistence.PersistenceContext;
 public class EntityManagerProvider {
     @PersistenceContext(unitName = "pu")
     @Produces
-    private EntityManager em;
+    EntityManager em;
 }
