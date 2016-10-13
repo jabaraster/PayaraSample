@@ -8,8 +8,8 @@
 		<jta-data-source>jdbc/App</jta-data-source>
 
 		<properties>
-			<property name="eclipselink.ddl-generation" value="create-tables" />
-			<property name="eclipselink.logging.level.sql" value="FINE" />
+<!-- 			<property name="eclipselink.ddl-generation" value="create-tables" />
+ -->			<property name="eclipselink.logging.level.sql" value="FINE" />
 			<property name="eclipselink.logging.parameters" value="true" />
 
 			<!-- eclipseのConsoleビューにSQLを出力するための設定. http://stackoverflow.com/questions/4676705/jpa-2-0-logging-and-tracing-through-with-glassfish-3-0-1-and-netbeans-6-9-1 -->
@@ -18,6 +18,7 @@
 
 			<!-- eclipselinkの２次キャッシュは切っておくのが無難. -->
 			<property name="eclipselink.cache.shared.default" value="false" />
+			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
 		</properties>
 	</persistence-unit>
 </persistence>

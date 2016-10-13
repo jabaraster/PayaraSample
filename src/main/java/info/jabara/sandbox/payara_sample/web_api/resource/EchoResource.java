@@ -1,7 +1,7 @@
 /**
  *
  */
-package info.jabara.sandbox.payara_sample.web.api;
+package info.jabara.sandbox.payara_sample.web_api.resource;
 
 import java.util.HashMap;
 import java.util.Map;

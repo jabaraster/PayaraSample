@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 org.eclipse.jpt.core.platform=generic2_1
-org.eclipse.jpt.jpa.core.discoverAnnotatedClasses=false
+org.eclipse.jpt.jpa.core.discoverAnnotatedClasses=true
+org.eclipse.jpt.jpa.core.metamodelSourceFolderName=src/main/java
 problem.ASSOCIATION_OVERRIDE_INVALID_NAME=error
 problem.ATTRIBUTE_OVERRIDE_DERIVED_AND_SPECIFIED=error
 problem.ATTRIBUTE_OVERRIDE_INVALID_NAME=error

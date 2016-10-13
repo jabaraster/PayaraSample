@@ -3,28 +3,23 @@
  */
 package info.jabara.sandbox.payara_sample.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author jabaraster
  */
-@Data
 @NoArgsConstructor
 @Entity
-public class EUser implements Serializable {
+@ToString(callSuper = true)
+public class EUser extends EntityBase<EUser> {
     private static final long serialVersionUID = 2512747791807206116L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long                      id;
-
+    @Getter
+    @Setter
     String                    name;
 }

@@ -10,9 +10,6 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,46 +26,52 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 /**
  * Payara Embedded App.
  */
-public class App {
+public class WebAppContainer {
 
-    private static final int HTTP_PORT    = 8081;
-    private static final int HTTPS_PORT   = 8082;
-    private static final int COMMAND_PORT = 10001;
+    private static final int   HTTPS_PORT   = 8082;
+    private static final int   COMMAND_PORT = 10001;
+
+    private final String       connectionPoolProperty;
+    private final int          httpPort;
+
+    private volatile GlassFish glassfish;
 
     /**
-     * @param pArgs -
+     * @param pConnnectionPoolProperty
+     * @param pHttpPort
      */
-    public static void main(final String[] pArgs) {
+    public WebAppContainer(final String pConnnectionPoolProperty, final int pHttpPort) {
+        this.connectionPoolProperty = pConnnectionPoolProperty;
+        this.httpPort = pHttpPort;
+    }
 
-        System.setProperty("java.awt.headless", Boolean.toString(true)); // ヘッドレスにしないとMacにおいてアイコンが起動して面倒 //$NON-NLS-1$
-        sendStopCommand(COMMAND_PORT); // 既に起動しているプロセスがあれば停止する.
+    /**
+     *
+     */
+    public void start() {
+        final Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startCore();
+            }
+        });
+        th.start();
+    }
 
-        try {
-            final BootstrapProperties bootstrap = new BootstrapProperties();
-            final GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap);
-            final GlassFishProperties glassfishProperties = new GlassFishProperties();
-            glassfishProperties.setPort("http-listener", HTTP_PORT); //$NON-NLS-1$
-            glassfishProperties.setPort("https-listener", HTTPS_PORT); //$NON-NLS-1$
-            final GlassFish glassfish = runtime.newGlassFish(glassfishProperties);
-            glassfish.start();
-
-            registerConnectionPool(glassfish);
-
-            glassfish.getDeployer().deploy( //
-                    new File("src/main/webapp") // //$NON-NLS-1$
-                    ,
-                    new String[] { "--name=PayaraSample" // //$NON-NLS-1$
-                            , "--contextroot" // //$NON-NLS-1$
-                            , "/" }); //$NON-NLS-1$
-
-            startMonitoringStopCommand(COMMAND_PORT, glassfish);
-
-        } catch (final GlassFishException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+    /**
+     *
+     */
+    public void stop() {
+        if (this.glassfish != null) {
+            try {
+                this.glassfish.stop();
+            } catch (final GlassFishException e) {
+                Logger.getLogger(WebAppContainer.class.getName()).log(Level.SEVERE, null, e);
+            }
         }
     }
 
-    private static void registerConnectionPool(final GlassFish glassfish) throws GlassFishException {
+    private void registerConnectionPool() throws GlassFishException {
         final String connectionPoolName = "conn-pool";
 
         // RDBとしてH2を使う場合.
@@ -93,7 +96,7 @@ public class App {
                 , "--steadypoolsize=2" //
                 , "--maxpoolsize=10" //
                 , "--poolresize=2" //
-                , "--property", "serverName=localhost:portNumber=5432:databaseName=app:user=app:password=xxx" //
+                , "--property", this.connectionPoolProperty //
                 , connectionPoolName //
         );
 
@@ -101,6 +104,43 @@ public class App {
                 , "--connectionpoolid", connectionPoolName //
                 , "jdbc/App" //
         );
+    }
+
+    private void startCore() {
+        System.setProperty("java.awt.headless", Boolean.toString(true)); // ヘッドレスにしないとMacにおいてアイコンが起動して面倒 //$NON-NLS-1$
+        sendStopCommand(COMMAND_PORT); // 既に起動しているプロセスがあれば停止する.
+
+        try {
+            final BootstrapProperties bootstrap = new BootstrapProperties();
+            final GlassFishRuntime runtime = GlassFishRuntime.bootstrap(bootstrap);
+            final GlassFishProperties glassfishProperties = new GlassFishProperties();
+            glassfishProperties.setPort("http-listener", this.httpPort); //$NON-NLS-1$
+            glassfishProperties.setPort("https-listener", HTTPS_PORT); //$NON-NLS-1$
+            this.glassfish = runtime.newGlassFish(glassfishProperties);
+            glassfish.start();
+
+            registerConnectionPool();
+
+            glassfish.getDeployer().deploy( //
+                    new File("src/main/webapp") // //$NON-NLS-1$
+                    ,
+                    new String[] { "--name=PayaraSample" // //$NON-NLS-1$
+                            , "--contextroot" // //$NON-NLS-1$
+                            , "/" }); //$NON-NLS-1$
+
+            startMonitoringStopCommand(COMMAND_PORT, glassfish);
+
+        } catch (final GlassFishException ex) {
+            Logger.getLogger(WebAppContainer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * @param pArgs -
+     */
+    public static void main(final String[] pArgs) {
+        new WebAppContainer("serverName=localhost:portNumber=5432:databaseName=app:user=app:password=xxx", 8081)
+                .start();
     }
 
     private static void sendStopCommand(final int pPort) {
@@ -120,15 +160,7 @@ public class App {
     }
 
     private static void startMonitoringStopCommand(final int pPort, final GlassFish pGlassfish) {
-        final ExecutorService ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
-            @Override
-            public Thread newThread(final Runnable pR) {
-                final Thread ret = new Thread(pR);
-                ret.setDaemon(true);
-                return ret;
-            }
-        });
-        ex.execute(new Runnable() {
+        final Thread th = new Thread(new Runnable() {
             @Override
             public void run() {
                 try (final ServerSocket server = new ServerSocket(pPort); //
@@ -140,5 +172,7 @@ public class App {
                 }
             }
         });
+        th.setDaemon(true);
+        th.start();
     }
 }
