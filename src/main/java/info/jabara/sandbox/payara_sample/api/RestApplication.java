@@ -8,7 +8,6 @@ import javax.ws.rs.core.Application;
 
 /**
  * @author jabaraster
- *
  */
 @ApplicationPath("/api")
 public class RestApplication extends Application {
