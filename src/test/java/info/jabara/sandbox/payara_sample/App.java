@@ -37,6 +37,7 @@ public class App {
      */
     public static void main(final String[] pArgs) {
 
+        System.setProperty("java.awt.headless", Boolean.toString(true)); // ヘッドレスにしないとMacにおいてアイコンが起動して面倒 //$NON-NLS-1$
         sendStopCommand(COMMAND_PORT); // 既に起動しているプロセスがあれば停止する.
 
         try {
