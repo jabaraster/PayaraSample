@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -24,7 +23,6 @@ import net.arnx.jsonic.JSON;
 /**
  * @author jabaraster
  */
-@Singleton
 @Provider
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,6 +34,7 @@ public class JsonReaderWriter implements MessageBodyReader<Object>, MessageBodyW
      * @see javax.ws.rs.ext.MessageBodyWriter#getSize(java.lang.Object, java.lang.Class, java.lang.reflect.Type,
      * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
      */
+    @SuppressWarnings("javadoc")
     @Override
     public long getSize(final Object pArg0, final Class<?> pArg1, final Type pArg2, final Annotation[] pArg3,
             final MediaType pArg4) {
@@ -48,12 +47,17 @@ public class JsonReaderWriter implements MessageBodyReader<Object>, MessageBodyW
      * @see javax.ws.rs.ext.MessageBodyReader#isReadable(java.lang.Class, java.lang.reflect.Type,
      * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
      */
+    @SuppressWarnings("javadoc")
     @Override
     public boolean isReadable(final Class<?> pArg0, final Type pArg1, final Annotation[] pArg2,
             final MediaType pMediaType) {
         return MediaType.APPLICATION_JSON_TYPE.isCompatible(pMediaType);
     }
 
+    /**
+     * @see javax.ws.rs.ext.MessageBodyWriter#isWriteable(java.lang.Class, java.lang.reflect.Type,
+     *      java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
+     */
     @Override
     public boolean isWriteable(final Class<?> pArg0, final Type pArg1, final Annotation[] pArg2,
             final MediaType pMediaType) {
@@ -67,6 +71,7 @@ public class JsonReaderWriter implements MessageBodyReader<Object>, MessageBodyW
      * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap,
      * java.io.InputStream)
      */
+    @SuppressWarnings("javadoc")
     @Override
     public Object readFrom(final Class<Object> pValueType, final Type pArg1, final Annotation[] pArg2,
             final MediaType pArg3, final MultivaluedMap<String, String> pArg4, final InputStream pData)
@@ -81,6 +86,7 @@ public class JsonReaderWriter implements MessageBodyReader<Object>, MessageBodyW
      * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap,
      * java.io.OutputStream)
      */
+    @SuppressWarnings("javadoc")
     @Override
     public void writeTo(final Object pValue, final Class<?> pArg1, final Type pArg2, final Annotation[] pArg3,
             final MediaType pArg4, final MultivaluedMap<String, Object> pArg5, final OutputStream pStream)

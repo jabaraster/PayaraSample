@@ -3,6 +3,9 @@
  */
 package info.jabara.sandbox.payara_sample.web.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -23,6 +26,19 @@ public class EchoResource {
 
     @Inject
     TimeService timeService;
+
+    /**
+     * @return
+     */
+    @SuppressWarnings("static-method")
+    @Path("/json")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Object> asJson() {
+        final Map<String, Object> ret = new HashMap<>();
+        ret.put("response", "Hello, World");
+        return ret;
+    }
 
     /**
      * @param pToken

@@ -17,19 +17,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.ConnectionPoolDataSource;
+
 import org.glassfish.embeddable.BootstrapProperties;
 import org.glassfish.embeddable.GlassFish;
 import org.glassfish.embeddable.GlassFishException;
 import org.glassfish.embeddable.GlassFishProperties;
 import org.glassfish.embeddable.GlassFishRuntime;
+import org.postgresql.ds.PGConnectionPoolDataSource;
 
 /**
  * Payara Embedded App.
  */
 public class App {
 
-    private static final int HTTP_PORT = 8081;
-    private static final int HTTPS_PORT = 8082;
+    private static final int HTTP_PORT    = 8081;
+    private static final int HTTPS_PORT   = 8082;
     private static final int COMMAND_PORT = 10001;
 
     /**
@@ -58,12 +61,16 @@ public class App {
                             , "--contextroot" // //$NON-NLS-1$
                             , "/" }); //$NON-NLS-1$
 
+            startMonitoringStopCommand(COMMAND_PORT, glassfish);
+
         } catch (final GlassFishException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private static void registerConnectionPool(final GlassFish glassfish) {
+    private static void registerConnectionPool(final GlassFish glassfish) throws GlassFishException {
+        final String connectionPoolName = "conn-pool";
+
         // RDBとしてH2を使う場合.
         // glassfish.getCommandRunner().run("create-jdbc-connection-pool" //
         // , "--datasourceclassname=" + JdbcDataSource.class.getName() //
@@ -80,22 +87,20 @@ public class App {
         // <version>9.4-1203-jdbc41</version>
         // <scope>provided</scope>
         // </dependency>
-        // glassfish.getCommandRunner().run("create-jdbc-connection-pool" //
-        // , "--datasourceclassname=" + PGConnectionPoolDataSource.class.getName() //
-        // , "--restype=" + ConnectionPoolDataSource.class.getName() //
-        // , "--steadypoolsize=2" //
-        // , "--maxpoolsize=10" //
-        // , "--poolresize=2" //
-        // , "--property", "serverName=192.168.50.13:portNumber=5432:databaseName=app:user=app:password=xxx" //
-        // , connectionPoolName //
-        // );
+        glassfish.getCommandRunner().run("create-jdbc-connection-pool" //
+                , "--datasourceclassname=" + PGConnectionPoolDataSource.class.getName() //
+                , "--restype=" + ConnectionPoolDataSource.class.getName() //
+                , "--steadypoolsize=2" //
+                , "--maxpoolsize=10" //
+                , "--poolresize=2" //
+                , "--property", "serverName=localhost:portNumber=5432:databaseName=app:user=app:password=xxx" //
+                , connectionPoolName //
+        );
 
-        // glassfish.getCommandRunner().run("create-jdbc-resource" //
-        // , "--connectionpoolid", connectionPoolName //
-        // , "jdbc/App" //
-        // );
-
-        startMonitoringStopCommand(COMMAND_PORT, glassfish);
+        glassfish.getCommandRunner().run("create-jdbc-resource" //
+                , "--connectionpoolid", connectionPoolName //
+                , "jdbc/App" //
+        );
     }
 
     private static void sendStopCommand(final int pPort) {
