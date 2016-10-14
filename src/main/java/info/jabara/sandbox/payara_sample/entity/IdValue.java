@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class IdValue<E extends EntityBase<E>> implements Serializable {
     private static final long serialVersionUID = 3664139031231941425L;
 
-    private final long        value;
+    private final long value;
 
     /**
      * @param pValue -
@@ -60,6 +60,6 @@ public class IdValue<E extends EntityBase<E>> implements Serializable {
      */
     @Override
     public String toString() {
-        return "IdValue [value=" + this.value + "]";
+        return "IdValue [value=" + this.value + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

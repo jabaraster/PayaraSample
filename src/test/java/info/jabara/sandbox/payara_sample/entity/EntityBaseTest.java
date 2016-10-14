@@ -26,7 +26,7 @@ public class EntityBaseTest {
         u.id = Long.valueOf(1);
         u.created = Calendar.getInstance().getTime();
         u.updated = u.created;
-        u.name = "hoge";
+        u.name = "hoge"; //$NON-NLS-1$
 
         final EntityBase.JsonConverter jc = new EntityBase.JsonConverter();
 
@@ -47,7 +47,7 @@ public class EntityBaseTest {
         final EUser u = new EUser();
         u.created = Calendar.getInstance().getTime();
         u.updated = u.created;
-        u.name = "hoge";
+        u.name = "hoge"; //$NON-NLS-1$
 
         final EntityBase.JsonConverter jc = new EntityBase.JsonConverter();
 
@@ -62,7 +62,7 @@ public class EntityBaseTest {
     /**
      *
      */
-    @SuppressWarnings("static-method")
+    @SuppressWarnings({ "static-method", "nls" })
     @Test
     public void _想定するJSONをオブジェクトに変換できること() {
         final long now = Calendar.getInstance().getTimeInMillis();

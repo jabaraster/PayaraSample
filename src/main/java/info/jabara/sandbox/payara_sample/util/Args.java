@@ -20,7 +20,7 @@ public final class Args {
      */
     public static <A> A checkNull(final A pArg, final String pArgName) {
         if (pArg == null) {
-            throw new IllegalArgumentException("引数 " + pArgName + " がnullです.");
+            throw new IllegalArgumentException(String.join(" ", "引数", pArgName, "がnullです.")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         return pArg;
     }

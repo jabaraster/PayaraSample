@@ -36,7 +36,7 @@ public class EchoResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> asJson() {
         final Map<String, Object> ret = new HashMap<>();
-        ret.put("response", "Hello, World");
+        ret.put("response", "Hello, World"); //$NON-NLS-1$ //$NON-NLS-2$
         return ret;
     }
 

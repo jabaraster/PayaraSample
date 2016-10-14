@@ -32,10 +32,10 @@ public class UserService {
      */
     @Transactional
     public List<EUser> getAll() {
-        final CriteriaBuilder builder = em.getCriteriaBuilder();
+        final CriteriaBuilder builder = this.em.getCriteriaBuilder();
         final CriteriaQuery<EUser> query = builder.createQuery(EUser.class);
         query.from(EUser.class);
-        return em.createQuery(query).getResultList();
+        return this.em.createQuery(query).getResultList();
     }
 
     /**
@@ -44,8 +44,8 @@ public class UserService {
      * @throws NotFound
      */
     public EUser getById(final IdValue<EUser> pId) throws NotFound {
-        Args.checkNull(pId, "pId");
-        final EUser ret = em.find(EUser.class, Long.valueOf(pId.getValue()));
+        Args.checkNull(pId, "pId"); //$NON-NLS-1$
+        final EUser ret = this.em.find(EUser.class, Long.valueOf(pId.getValue()));
         if (ret == null) {
             throw NotFound.INSTANCE;
         }
@@ -58,7 +58,7 @@ public class UserService {
     @Transactional
     @WithErrorMessage
     public void persist(final EUser pUser) {
-        Args.checkNull(pUser, "pUser");
+        Args.checkNull(pUser, "pUser"); //$NON-NLS-1$
         this.em.persist(pUser);
         this.em.flush();
     }

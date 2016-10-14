@@ -32,15 +32,15 @@ public abstract class EntityBase<E extends EntityBase<E>> implements Serializabl
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long                      id;
+    Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    Date                      created;
+    Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    Date                      updated;
+    Date updated;
 
     /**
      * @return -
@@ -120,7 +120,8 @@ public abstract class EntityBase<E extends EntityBase<E>> implements Serializabl
                 , final Class<? extends T> cls //
                 , final Type type //
         ) throws Exception {
-            if ("id".equals(context.getKey())) {
+
+            if ("id".equals(context.getKey())) { //$NON-NLS-1$
                 if (value == null) {
                     return null;
                 }
@@ -139,7 +140,7 @@ public abstract class EntityBase<E extends EntityBase<E>> implements Serializabl
          */
         @Override
         protected Object preformat(final Context context, final Object value) throws Exception {
-            if ("id".equals(context.getKey()) && value instanceof IdValue<?>) {
+            if ("id".equals(context.getKey()) && value instanceof IdValue<?>) { //$NON-NLS-1$
                 final IdValue<?> id = (IdValue<?>) value;
                 return Long.valueOf(id.getValue());
             }

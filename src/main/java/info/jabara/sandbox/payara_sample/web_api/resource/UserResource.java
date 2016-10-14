@@ -18,6 +18,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
 import info.jabara.sandbox.payara_sample.entity.EUser;
 import info.jabara.sandbox.payara_sample.entity.IdValue;
@@ -35,7 +36,7 @@ public class UserResource {
     UserService userService;
 
     @Inject
-    Validator   validator;
+    Validator validator;
 
     /**
      * @param pId
@@ -81,6 +82,13 @@ public class UserResource {
         }
 
         this.userService.persist(pUser);
-        return Response.status(Status.CREATED).build();
+        final String uri = "/api" // //$NON-NLS-1$
+                + UriBuilder.fromResource(UserResource.class) //
+                        .build().toString() //
+                + UriBuilder.fromMethod(UserResource.class, "getById") // //$NON-NLS-1$
+                        .build(Long.valueOf(pUser.getId().getValue())).toString();
+        return Response.created(UriBuilder.fromPath(uri).build()) //
+                .entity(pUser) //
+                .build();
     }
 }

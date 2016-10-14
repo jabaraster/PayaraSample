@@ -28,11 +28,11 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
  */
 public class WebAppContainer {
 
-    private static final int   HTTPS_PORT   = 8082;
-    private static final int   COMMAND_PORT = 10001;
+    // private static final int HTTPS_PORT = 8082;
+    private static final int COMMAND_PORT = 10001;
 
-    private final String       connectionPoolProperty;
-    private final int          httpPort;
+    private final String connectionPoolProperty;
+    private final int httpPort;
 
     private volatile GlassFish glassfish;
 
@@ -50,6 +50,7 @@ public class WebAppContainer {
      */
     public void start() {
         final Thread th = new Thread(new Runnable() {
+            @SuppressWarnings("synthetic-access")
             @Override
             public void run() {
                 startCore();
@@ -71,6 +72,7 @@ public class WebAppContainer {
         }
     }
 
+    @SuppressWarnings("nls")
     private void registerConnectionPool() throws GlassFishException {
         final String connectionPoolName = "conn-pool";
 
@@ -90,19 +92,21 @@ public class WebAppContainer {
         // <version>9.4-1203-jdbc41</version>
         // <scope>provided</scope>
         // </dependency>
-        glassfish.getCommandRunner().run("create-jdbc-connection-pool" //
-                , "--datasourceclassname=" + PGConnectionPoolDataSource.class.getName() //
-                , "--restype=" + ConnectionPoolDataSource.class.getName() //
-                , "--steadypoolsize=2" //
-                , "--maxpoolsize=10" //
-                , "--poolresize=2" //
-                , "--property", this.connectionPoolProperty //
-                , connectionPoolName //
+        this.glassfish.getCommandRunner() //
+                .run("create-jdbc-connection-pool" //
+                        , "--datasourceclassname=" + PGConnectionPoolDataSource.class.getName() //
+                        , "--restype=" + ConnectionPoolDataSource.class.getName() //
+                        , "--steadypoolsize=2" //
+                        , "--maxpoolsize=10" //
+                        , "--poolresize=2" //
+                        , "--property", this.connectionPoolProperty //
+                        , connectionPoolName //
         );
 
-        glassfish.getCommandRunner().run("create-jdbc-resource" //
-                , "--connectionpoolid", connectionPoolName //
-                , "jdbc/App" //
+        this.glassfish.getCommandRunner() //
+                .run("create-jdbc-resource" //
+                        , "--connectionpoolid", connectionPoolName //
+                        , "jdbc/App" //
         );
     }
 
@@ -118,18 +122,19 @@ public class WebAppContainer {
             glassfishProperties.setPort("http-listener", this.httpPort); //$NON-NLS-1$
             // glassfishProperties.setPort("https-listener", HTTPS_PORT); //$NON-NLS-1$
             this.glassfish = runtime.newGlassFish(glassfishProperties);
-            glassfish.start();
+            this.glassfish.start();
 
             registerConnectionPool();
 
-            glassfish.getDeployer().deploy( //
-                    new File("src/main/webapp") // //$NON-NLS-1$
-                    ,
-                    new String[] { "--name=PayaraSample" // //$NON-NLS-1$
-                            , "--contextroot" // //$NON-NLS-1$
-                            , "/" }); //$NON-NLS-1$
+            this.glassfish.getDeployer() //
+                    .deploy( //
+                            new File("src/main/webapp") // //$NON-NLS-1$
+                            ,
+                            new String[] { "--name=PayaraSample" // //$NON-NLS-1$
+                                    , "--contextroot" // //$NON-NLS-1$
+                                    , "/" }); //$NON-NLS-1$
 
-            startMonitoringStopCommand(COMMAND_PORT, glassfish);
+            startMonitoringStopCommand(COMMAND_PORT, this.glassfish);
 
         } catch (final GlassFishException e) {
             Logger.getLogger(WebAppContainer.class.getName()).log(Level.SEVERE, null, e);
@@ -140,12 +145,12 @@ public class WebAppContainer {
      * @param pArgs -
      */
     public static void main(final String[] pArgs) {
-        new WebAppContainer("serverName=localhost:portNumber=5432:databaseName=app:user=app:password=xxx", 8081)
+        new WebAppContainer("serverName=localhost:portNumber=5432:databaseName=app:user=app:password=xxx", 8081) //$NON-NLS-1$
                 .start();
     }
 
     private static void sendStopCommand(final int pPort) {
-        try (final Socket accept = new Socket(InetAddress.getByName("127.0.0.1"), pPort)) {
+        try (final Socket accept = new Socket(InetAddress.getByName("127.0.0.1"), pPort)) { //$NON-NLS-1$
             new BufferedWriter(new OutputStreamWriter(accept.getOutputStream())).newLine();
         } catch (@SuppressWarnings("unused") final ConnectException e) {
             // nop
