@@ -8,6 +8,7 @@ import javax.enterprise.context.Dependent;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
+import javax.ws.rs.WebApplicationException;
 
 /**
  * @author jabaraster
@@ -23,6 +24,10 @@ public class ErrorMessageInterceptor implements Serializable {
     Object invoke(final InvocationContext ic) throws Exception {
         try {
             return ic.proceed();
+
+        } catch (final WebApplicationException e) {
+            throw e;
+
         } catch (final Exception e) {
             final Logger logger = Logger.getLogger(ic.getTarget().getClass().getSuperclass().getName());
             logger.log(Level.SEVERE, e.getMessage(), e);

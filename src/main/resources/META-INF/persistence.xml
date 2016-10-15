@@ -6,6 +6,8 @@
 	<persistence-unit name="pu" transaction-type="JTA">
 
 		<jta-data-source>jdbc/App</jta-data-source>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<validation-mode>CALLBACK</validation-mode>
 
 		<properties>
 			<property name="javax.persistence.schema-generation.database.action"
@@ -23,12 +25,17 @@
 		</properties>
 	</persistence-unit>
 
-	<persistence-unit name="pu-with-schema-recreate"
-		transaction-type="JTA">
+	<persistence-unit name="pu-for-ut" transaction-type="RESOURCE_LOCAL">
 
-		<jta-data-source>jdbc/App</jta-data-source>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<validation-mode>CALLBACK</validation-mode>
 
 		<properties>
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/app" />
+			<property name="javax.persistence.jdbc.password" value="xxx" />
+			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+			<property name="javax.persistence.jdbc.user" value="app" />
+
 			<property name="javax.persistence.schema-generation.database.action"
 				value="drop-and-create" />
 
@@ -41,6 +48,7 @@
 
 			<!-- eclipselinkの２次キャッシュは切っておくのが無難. -->
 			<property name="eclipselink.cache.shared.default" value="false" />
+
 		</properties>
 	</persistence-unit>
 

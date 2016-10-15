@@ -11,6 +11,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import info.jabara.sandbox.payara_sample.system.JsonConverter;
+
 /**
  * @author jabaraster
  */
@@ -28,7 +30,7 @@ public class EntityBaseTest {
         u.updated = u.created;
         u.name = "hoge"; //$NON-NLS-1$
 
-        final EntityBase.JsonConverter jc = new EntityBase.JsonConverter();
+        final JsonConverter jc = new JsonConverter();
 
         final EUser c = jc.parse(jc.format(u), EUser.class);
 
@@ -49,7 +51,7 @@ public class EntityBaseTest {
         u.updated = u.created;
         u.name = "hoge"; //$NON-NLS-1$
 
-        final EntityBase.JsonConverter jc = new EntityBase.JsonConverter();
+        final JsonConverter jc = new JsonConverter();
 
         final EUser c = jc.parse(jc.format(u), EUser.class);
 
@@ -68,7 +70,7 @@ public class EntityBaseTest {
         final long now = Calendar.getInstance().getTimeInMillis();
         final String name = "hoge";
         final String json = "{\"id\":1,\"name\":\"" + name + "\",\"created\":" + now + ",\"updated\":" + now + "}";
-        final EUser u = new EntityBase.JsonConverter().parse(json, EUser.class);
+        final EUser u = new JsonConverter().parse(json, EUser.class);
 
         assertThat(u.getId(), is(new IdValue<EUser>(1)));
         assertThat(u.getName(), is(name));

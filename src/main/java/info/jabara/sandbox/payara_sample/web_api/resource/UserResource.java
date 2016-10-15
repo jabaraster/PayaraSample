@@ -7,7 +7,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.validation.Validator;
+import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -22,21 +23,24 @@ import javax.ws.rs.core.UriBuilder;
 
 import info.jabara.sandbox.payara_sample.entity.EUser;
 import info.jabara.sandbox.payara_sample.entity.IdValue;
+import info.jabara.sandbox.payara_sample.model.Duplicate;
 import info.jabara.sandbox.payara_sample.model.NotFound;
 import info.jabara.sandbox.payara_sample.service.UserService;
+import info.jabara.sandbox.payara_sample.system.WithErrorMessage;
 
 /**
  *
  */
 @Path("/user")
 @Singleton
+@WithErrorMessage
 public class UserResource {
 
     @Inject
-    UserService userService;
+    UserService      userService;
 
     @Inject
-    Validator validator;
+    PayloadValidator validator;
 
     /**
      * @param pId
@@ -70,18 +74,29 @@ public class UserResource {
     @Path("/index")
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
+    @Transactional(dontRollbackOn = { ConstraintViolationException.class, Duplicate.class })
     public Response putIndex(final EUser pUser) {
         if (pUser == null) {
             return Response.status(Status.BAD_REQUEST).build();
         }
 
+        // this.validator.validate(pUser);
+
+        if (pUser.isPersisted()) {
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST) //
+                    .entity("persisted.") //
+                    .build());
+        }
         try {
-            this.validator.validate(pUser);
-        } catch (final Exception e) {
-            e.printStackTrace();
+            this.userService.persistOrUpdate(pUser);
+        } catch (final ConstraintViolationException e) {
+            throw new WebApplicationException(this.validator.badRequest(e.getConstraintViolations()).build());
+        } catch (@SuppressWarnings("unused") final Duplicate e) {
+            throw new WebApplicationException(Response.status(Status.BAD_REQUEST) //
+                    .entity("name:duplicated.") //
+                    .build());
         }
 
-        this.userService.persist(pUser);
         final String uri = "/api" // //$NON-NLS-1$
                 + UriBuilder.fromResource(UserResource.class) //
                         .build().toString() //

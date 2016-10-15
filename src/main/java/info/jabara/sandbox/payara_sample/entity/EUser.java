@@ -28,6 +28,6 @@ public class EUser extends EntityBase<EUser> {
     @Setter
     @NotNull
     @Size(min = 1, max = MAX_CHAR_COUNT)
-    @Column(length = MAX_CHAR_COUNT * 3)
+    @Column(length = MAX_CHAR_COUNT * 3, unique = true)
     String                    name;
 }

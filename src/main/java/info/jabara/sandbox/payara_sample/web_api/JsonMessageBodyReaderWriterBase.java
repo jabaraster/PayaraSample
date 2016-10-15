@@ -14,7 +14,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
-import info.jabara.sandbox.payara_sample.entity.EntityBase;
+import info.jabara.sandbox.payara_sample.system.JsonConverter;
 import net.arnx.jsonic.JSON;
 
 /**
@@ -23,7 +23,7 @@ import net.arnx.jsonic.JSON;
 public abstract class JsonMessageBodyReaderWriterBase<E> implements MessageBodyReader<E>, MessageBodyWriter<E> {
 
     static {
-        JSON.prototype = EntityBase.JsonConverter.class;
+        JSON.prototype = JsonConverter.class;
     }
 
     /**
